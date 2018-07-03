@@ -1,19 +1,15 @@
-from __future__ import print_function
 import numpy as np
 import lp, PhiDivergence, PhiLP
 import time
 import os
-import cplex
-import json
 import scipy.io as sio
-from scipy.sparse import csr_matrix, find, coo_matrix, hstack, vstack
 
 mat_data = sio.loadmat(os.getcwd() + "/mat_data/NI48.mat")
 lp = lp.set(mat_data)
 
 start = time.clock()
-alpha = 0.01
-inPhi = PhiDivergence.set('mchi2')
+alpha = 0.05
+inPhi = PhiDivergence.set('burg')
 obs = lp.obs
 inRho = inPhi.Rho(alpha, obs)
 philp = PhiLP.set(lp, inPhi, obs, inRho)
@@ -69,24 +65,18 @@ while not (
 
     philp.UpdateSolutions()
     philp.UpdateTolerances()
-    philp.WriteProgress()
+    # philp.WriteProgress()
+    #
+    # print('Total cuts made: ' + str(totalCutsMade))
+    # print('Total problems solved: ' + str(totalProblemsSolved))
+    # print("=" * 100)
 
-    print('Total cuts made: ' + str(totalCutsMade))
-    print('Total problems solved: ' + str(totalProblemsSolved))
-    print("=" * 100)
-
+timeRuns=time.clock() - start
 outTotalCuts = totalCutsMade
 outTotalProbs = totalProblemsSolved
 
-result = {"phi": str(philp.phi.divergence),
-          "alpha": str(alpha),
-          "runtime": str(time.clock() - start) + "seconds",
-          "objVals": str(philp.ObjectiveValue() / philp.objectiveScale),
-          "pWorst": str(philp.pWorst),
-          "x": str(philp.bestSolution.X()),
-          "mu": str(philp.bestSolution.Mu()),
-          "lambda": str(philp.bestSolution.Lambda())}
-
-filename = "test.json"
-with open(filename, 'w') as outfile:
-    json.dump(result, outfile, indent=3)
+print(philp.ObjectiveValue(), '\n',
+      philp.bestSolution.Mu(), '\n',
+      philp.bestSolution.Lambda(), '\n',
+      totalProblemsSolved, '\n',
+      timeRuns-philp.timeruns1)

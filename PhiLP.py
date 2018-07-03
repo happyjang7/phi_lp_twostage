@@ -8,30 +8,15 @@ required modules
 3. cplex, cplex.exceptions, cplex.callbacks
 4. lp, ExtensiveForm, PhiDivergence, Solution
 '''
-from __future__ import print_function
-import sys
-import os
+import sys, os, time
 import scipy.io as sio
-from scipy.sparse import csr_matrix, find, coo_matrix, hstack, vstack
-
+from scipy.stats import chi2
 sys.path.append("/Applications/CPLEX_Studio128/cplex/python/3.6/x86-64_osx")
 import numpy as np
-from scipy.stats import chi2
-import warnings, copy
+import warnings
 import cplex
-from cplex.exceptions import CplexError
-from cplex.callbacks import SimplexCallback
-import lp, ExtensiveForm, ExtepectedForm, PhiDivergence, Solution
+import lp, ExtepectedForm, PhiDivergence, Solution
 import copy
-
-class MyCallback(SimplexCallback):
-    def __call__(self):
-        print("CB Iteration ", self.get_num_iterations(), " : ", end=' ')
-        if self.is_primal_feasible():
-            print("CB Objective = ", self.get_objective_value())
-        else:
-            print("CB Infeasibility measure = ",
-                  self.get_primal_infeasibility())
 
 
 class set(object):
@@ -64,10 +49,10 @@ class set(object):
         self.LAMBDA = self.lpModel.first_obj.size
         self.MU = self.LAMBDA + 1
 
-        if inCutType == "single":
-            thetaOffset = 1
-        elif inCutType == "multi":
+        if inCutType == "multi":
             thetaOffset = np.arange(1, self.lpModel.numScenarios + 1)
+        elif inCutType == "single":
+            thetaOffset = 1
         else:
             raise Exception('Cut types available: single and multi')
         self.THETA = self.MU + thetaOffset
@@ -79,10 +64,11 @@ class set(object):
         self.InitializeBenders()
 
     def InitializeBenders(self):
-        self.objectiveCutsMatrix = np.array([])
+        self.objectiveCutsMatrix = np.array([], dtype=np.int64).reshape(0, self.lpModel.first_obj.size + 2 + self.THETA.size)
         self.objectiveCutsRHS = np.array([])
-        self.feasibilityCutsMatrix = np.array([])
+        self.feasibilityCutsMatrix = np.array([], dtype=np.int64).reshape(0, self.lpModel.first_obj.size + 2 + self.THETA.size)
         self.feasibilityCutsRHS = np.array([])
+
         self.zLower = -np.inf
         self.zUpper = np.inf
 
@@ -91,8 +77,9 @@ class set(object):
 
         self.ResetSecondStageSolutions()
         self.newSolutionAccepted = True
+        start1 = time.clock()
         x0, exitFlag, slack, pi, dj = ExtepectedForm.solve(self.lpModel)
-        # x0, exitFlag = ExtensiveForm.solve(self.lpModel)
+        self.timeruns1 = time.clock() - start1
         if exitFlag != 1:
             raise Exception('Could not solve first stage LP')
         cols = self.lpModel.first_obj.size
@@ -129,25 +116,17 @@ class set(object):
 
         currentBest = self.GetDecisions(self.bestSolution)
         self.candidateSolution.Reset()
-        try:
-            mdl_master = cplex.Cplex()
-            mdl_master.set_problem_name("mdl_master")
-            mdl_master.parameters.lpmethod.set(mdl_master.parameters.lpmethod.values.auto)
-            mdl_master.objective.set_sense(mdl_master.objective.sense.minimize)
-            mdl_master.variables.add(obj=cMaster, lb=lMaster, ub=uMaster)
-            mdl_master.linear_constraints.add(senses=senseMaster + CutSense, rhs=np.hstack((bMaster, CutMatrixRHS)))
-            mdl_master.linear_constraints.set_coefficients(list(AMaster) + CutMatrix_coefficients)
 
-            mdl_master.set_results_stream(None)
-            mdl_master.solve()
-            mdl_master.register_callback(MyCallback)
+        mdl_master = cplex.Cplex()
+        mdl_master.variables.add(obj=cMaster, lb=lMaster, ub=uMaster)
+        mdl_master.linear_constraints.add(senses=senseMaster + CutSense, rhs=np.hstack((bMaster, CutMatrixRHS)))
+        mdl_master.linear_constraints.set_coefficients(list(AMaster) + CutMatrix_coefficients)
+        mdl_master.set_results_stream(None)
+        mdl_master.solve()
 
-            solution = mdl_master.solution
-            numvars = mdl_master.variables.get_num()
-            currentCandidate = np.array(solution.get_values(0, numvars - 1))
-            exitFlag = solution.get_status()
-        except CplexError as exc:
-            print(exc)
+        currentCandidate = np.array(mdl_master.solution.get_values())
+        exitFlag = mdl_master.solution.get_status()
+
 
         if currentCandidate[self.LAMBDA] < lMaster[self.LAMBDA]:
             if self.phi.Conjugate(-np.inf) == -np.inf:
@@ -190,23 +169,16 @@ class set(object):
         sense = self.lpModel.second_sense[inScenNumber]
 
         xLocal = inSolution.X()
-        try:
-            mdl_sub = cplex.Cplex()
-            mdl_sub.set_problem_name("mdl_sub")
-            mdl_sub.parameters.lpmethod.set(mdl_sub.parameters.lpmethod.values.auto)
 
-            mdl_sub.objective.set_sense(mdl_sub.objective.sense.minimize)
-            mdl_sub.variables.add(obj=q, lb=l, ub=u)
-            mdl_sub.linear_constraints.add(senses=sense, rhs=d + xLocal * B.transpose())
-            mdl_sub.linear_constraints.set_coefficients(D)
-            mdl_sub.set_results_stream(None)
-            mdl_sub.solve()
-            mdl_sub.register_callback(MyCallback)
-            solution = mdl_sub.solution
+        mdl_sub = cplex.Cplex()
+        mdl_sub.variables.add(obj=q, lb=l, ub=u)
+        mdl_sub.linear_constraints.add(senses=sense, rhs=d + xLocal * B.transpose())
+        mdl_sub.linear_constraints.set_coefficients(D)
+        mdl_sub.set_results_stream(None)
+        mdl_sub.solve()
+        solution = mdl_sub.solution
+        exitFlag = solution.get_status()
 
-            exitFlag = solution.get_status()
-        except CplexError as exc:
-            print(exc)
         if exitFlag != 1:
             warnings.warn("'***Scenario '" + str(inScenNumber) + "' exited with flag '" + str(exitFlag) + "'")
 
@@ -254,23 +226,18 @@ class set(object):
                                                  np.array(1 - conjDerivs[ii]))) for ii in
                                       range(self.lpModel.numScenarios)])
         intermediateSlope[np.where(self.numObsPerScen == 0)[0]] = 0
-        if self.THETA.size == 1:
-            slope = np.matmul(self.numObsPerScen / self.numObsTotal, intermediateSlope)
-        elif self.THETA.size == self.lpModel.numScenarios:
+        if self.THETA.size == self.lpModel.numScenarios:
             slope = intermediateSlope
+        elif self.THETA.size == 1:
+            slope = np.matmul(self.numObsPerScen / self.numObsTotal, intermediateSlope)
         else:
             raise Exception('Wrong size of obj.THETA.  This should not happen')
 
         intercept = self.candidateSolution.ThetaTrue() - np.matmul(slope, np.transpose(
             np.hstack((xLocal, lambdaLocal, muLocal))))
 
-        if self.objectiveCutsMatrix.size == 0 and self.objectiveCutsRHS.size == 0:
-            self.objectiveCutsMatrix = np.hstack((slope, -np.eye(self.THETA.size)))
-            self.objectiveCutsRHS = -intercept
-        else:
-            self.objectiveCutsMatrix = np.vstack(
-                [self.objectiveCutsMatrix, np.hstack((slope, -np.eye(self.THETA.size)))])
-            self.objectiveCutsRHS = np.append(self.objectiveCutsRHS, -intercept)
+        self.objectiveCutsMatrix = np.vstack([self.objectiveCutsMatrix, np.hstack((slope, -np.eye(self.THETA.size)))])
+        self.objectiveCutsRHS = np.append(self.objectiveCutsRHS, -intercept)
 
         if lambdaZero:
             self.candidateSolution.SetLambda(0)
@@ -283,12 +250,8 @@ class set(object):
             [self.candidateSolution.SecondStageSlope(hIndex), -limit, np.array([-1]), np.zeros(self.THETA.size)])
         feasInt = self.candidateSolution.SecondStageIntercept(hIndex)
 
-        if self.feasibilityCutsMatrix.size == 0 and self.feasibilityCutsRHS.size == 0:
-            self.feasibilityCutsMatrix = np.array([feasSlope])
-            self.feasibilityCutsRHS = -feasInt
-        else:
-            self.feasibilityCutsMatrix = np.vstack([self.feasibilityCutsMatrix, feasSlope])
-            self.feasibilityCutsRHS = np.append(self.feasibilityCutsRHS, -feasInt)
+        self.feasibilityCutsMatrix = np.vstack([self.feasibilityCutsMatrix, feasSlope])
+        self.feasibilityCutsRHS = np.append(self.feasibilityCutsRHS, -feasInt)
 
     def FindFeasibleMu(self):
         lambdaLocal = self.candidateSolution.Lambda()
@@ -315,10 +278,10 @@ class set(object):
         if not all(np.isfinite(rawTheta)):
             raise Exception('Nonfinite theta, lambda = ' + str(lambdaLocal))
 
-        if self.THETA.size == 1:
-            inSolution.SetTheta(np.dot(self.numObsPerScen / self.numObsTotal, rawTheta), 'true')
-        elif self.THETA.size == self.lpModel.numScenarios:
+        if self.THETA.size == self.lpModel.numScenarios:
             inSolution.SetTheta(rawTheta, 'true')
+        elif self.THETA.size == 1:
+            inSolution.SetTheta(np.dot(self.numObsPerScen / self.numObsTotal, rawTheta), 'true')
         else:
             raise Exception('Wrong size of obj.THETA.  This should not happen')
 
@@ -411,10 +374,10 @@ class set(object):
         cOut = np.append(self.lpModel.first_obj, np.zeros(2 + self.THETA.size)) * self.objectiveScale
         cOut[self.LAMBDA] = 0
         cOut[self.MU] = 0
-        if self.THETA.size == 1:
-            cOut[self.THETA] = 1;
-        elif self.THETA.size == self.lpModel.numScenarios:
+        if self.THETA.size == self.lpModel.numScenarios:
             cOut[self.THETA] = self.numObsPerScen / self.numObsTotal
+        elif self.THETA.size == 1:
+            cOut[self.THETA] = 1
         else:
             raise Exception('Wrong size of obj.THETA.  This should not happen')
         return cOut
@@ -449,10 +412,10 @@ class set(object):
         vOut = np.append(solution.X(), np.zeros(2 + self.THETA.size))
         vOut[self.LAMBDA] = solution.Lambda()
         vOut[self.MU] = solution.Mu()
-        if inType == 'master':
-            vOut[self.THETA] = solution.ThetaMaster()
-        elif inType == 'true':
+        if inType == 'true':
             vOut[self.THETA] = solution.ThetaTrue()
+        elif inType == 'master':
+            vOut[self.THETA] = solution.ThetaMaster()
         else:
             raise Exception('Only accepts ''master and ''true''')
         return vOut
@@ -494,7 +457,3 @@ if __name__ == "__main__":
 
     philp = set(lp, inPhi, obs, inRho)
 
-    print(philp.feasibilityCutsRHS)
-    philp.DeleteOldestFeasibilityCut()
-    print("====" * 50)
-    print(philp.feasibilityCutsRHS)

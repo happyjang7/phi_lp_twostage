@@ -1,27 +1,11 @@
-from __future__ import print_function
 import sys
 import os
 sys.path.append("/Applications/CPLEX_Studio128/cplex/python/3.6/x86-64_osx")
 import numpy as np
-
 import cplex
 from cplex.exceptions import CplexError
-from cplex.callbacks import SimplexCallback
-
 import scipy.io as sio
-from scipy.sparse import csr_matrix, find
-
-class MyCallback(SimplexCallback):
-    def __call__(self):
-        print("CB Iteration ", self.get_num_iterations(), " : ", end=' ')
-        if self.is_primal_feasible():
-            print("CB Objective = ", self.get_objective_value())
-        else:
-            print("CB Infeasibility measure = ",
-                  self.get_primal_infeasibility())
-
-
-
+from scipy.sparse import find
 
 class set(object):
     def __init__(self, mat_data):
@@ -82,7 +66,6 @@ if __name__ == "__main__":
 
 
         apl1p.solve()
-        apl1p.register_callback(MyCallback)
         solution = apl1p.solution
 
         numvars = apl1p.variables.get_num()
@@ -101,7 +84,6 @@ if __name__ == "__main__":
         apl1p_2nd.linear_constraints.add(senses=lp.second_sense[0], rhs=lp.second_rhs[0] + x * lp.second_B[0].transpose())
         apl1p_2nd.linear_constraints.set_coefficients(lp.second_coefficients[0])
         apl1p_2nd.solve()
-        apl1p_2nd.register_callback(MyCallback)
         solution = apl1p_2nd.solution
 
         numvars = apl1p_2nd.variables.get_num()

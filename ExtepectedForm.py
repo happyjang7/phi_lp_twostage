@@ -1,26 +1,11 @@
-from __future__ import print_function
 import sys, os
-
 sys.path.append("/Applications/CPLEX_Studio128/cplex/python/3.6/x86-64_osx")
 import numpy as np
-from scipy.linalg import block_diag
 import lp
 import cplex
-from cplex.exceptions import CplexError
-from cplex.callbacks import SimplexCallback
 import scipy.io as sio
-from scipy.sparse import csr_matrix, find, coo_matrix, hstack, vstack
-import json
+from scipy.sparse import csr_matrix, find, hstack, vstack
 import copy
-
-class MyCallback(SimplexCallback):
-    def __call__(self):
-        print("CB Iteration ", self.get_num_iterations(), " : ", end=' ')
-        if self.is_primal_feasible():
-            print("CB Objective = ", self.get_objective_value())
-        else:
-            print("CB Infeasibility measure = ",
-                  self.get_primal_infeasibility())
 
 
 def solve(lp):
@@ -48,31 +33,22 @@ def solve(lp):
     A_vals = find(expected_A)[2].tolist()
     expected_A_coefficients = zip(A_rows, A_cols, A_vals)
 
-    try:
-        mdl = cplex.Cplex()
-        mdl.set_problem_name("mdl")
-        mdl.parameters.lpmethod.set(mdl.parameters.lpmethod.values.auto)
 
-        mdl.objective.set_sense(mdl.objective.sense.minimize)
-        mdl.variables.add(obj=expected_obj, lb=expected_lb, ub=expected_ub)
-        mdl.linear_constraints.add(senses=expected_sense, rhs=expected_rhs)
-        mdl.linear_constraints.set_coefficients(expected_A_coefficients)
-        mdl.set_results_stream(None)
-        mdl.solve()
-        mdl.register_callback(MyCallback)
-        solution = mdl.solution
+    mdl = cplex.Cplex()
+    mdl.set_problem_name("mdl")
+    mdl.variables.add(obj=expected_obj, lb=expected_lb, ub=expected_ub)
+    mdl.linear_constraints.add(senses=expected_sense, rhs=expected_rhs)
+    mdl.linear_constraints.set_coefficients(expected_A_coefficients)
+    mdl.set_results_stream(None)
+    mdl.solve()
+    solution = mdl.solution
+    exitFlag = solution.get_status()
 
-        # numvars = mdl.variables.get_num()
-        # x = np.array(solution.get_values(0, numvars - 1))
-        exitFlag = solution.get_status()
-
-        slack = solution.get_linear_slacks()
-        pi = solution.get_dual_values()
-        x = solution.get_values()
-        dj = solution.get_reduced_costs()
-        return (np.array(x), exitFlag, np.array(slack), np.array(pi), np.array(dj))
-    except CplexError as exc:
-        print(exc)
+    slack = solution.get_linear_slacks()
+    pi = solution.get_dual_values()
+    x = solution.get_values()
+    dj = solution.get_reduced_costs()
+    return (np.array(x), exitFlag, np.array(slack), np.array(pi), np.array(dj))
 
 
 if __name__ == "__main__":
