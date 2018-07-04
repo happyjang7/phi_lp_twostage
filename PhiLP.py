@@ -11,6 +11,7 @@ required modules
 import sys, os, time
 import scipy.io as sio
 from scipy.stats import chi2
+
 sys.path.append("/Applications/CPLEX_Studio128/cplex/python/3.6/x86-64_osx")
 import numpy as np
 import warnings
@@ -64,9 +65,11 @@ class set(object):
         self.InitializeBenders()
 
     def InitializeBenders(self):
-        self.objectiveCutsMatrix = np.array([], dtype=np.int64).reshape(0, self.lpModel.first_obj.size + 2 + self.THETA.size)
+        self.objectiveCutsMatrix = np.array([], dtype=np.int64).reshape(0,
+                                                                        self.lpModel.first_obj.size + 2 + self.THETA.size)
         self.objectiveCutsRHS = np.array([])
-        self.feasibilityCutsMatrix = np.array([], dtype=np.int64).reshape(0, self.lpModel.first_obj.size + 2 + self.THETA.size)
+        self.feasibilityCutsMatrix = np.array([], dtype=np.int64).reshape(0,
+                                                                          self.lpModel.first_obj.size + 2 + self.THETA.size)
         self.feasibilityCutsRHS = np.array([])
 
         self.zLower = -np.inf
@@ -127,7 +130,6 @@ class set(object):
         currentCandidate = np.array(mdl_master.solution.get_values())
         exitFlag = mdl_master.solution.get_status()
 
-
         if currentCandidate[self.LAMBDA] < lMaster[self.LAMBDA]:
             if self.phi.Conjugate(-np.inf) == -np.inf:
                 currentCandidate[self.LAMBDA] = lMaster[self.LAMBDA]
@@ -171,10 +173,10 @@ class set(object):
         xLocal = inSolution.X()
 
         mdl_sub = cplex.Cplex()
+        mdl_sub.set_results_stream(None)
         mdl_sub.variables.add(obj=q, lb=l, ub=u)
         mdl_sub.linear_constraints.add(senses=sense, rhs=d + xLocal * B.transpose())
         mdl_sub.linear_constraints.set_coefficients(D)
-        mdl_sub.set_results_stream(None)
         mdl_sub.solve()
         solution = mdl_sub.solution
         exitFlag = solution.get_status()
@@ -456,4 +458,3 @@ if __name__ == "__main__":
     inRho = inPhi.Rho(0.05, obs)
 
     philp = set(lp, inPhi, obs, inRho)
-

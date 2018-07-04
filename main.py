@@ -65,11 +65,11 @@ while not (
 
     philp.UpdateSolutions()
     philp.UpdateTolerances()
-    # philp.WriteProgress()
-    #
-    # print('Total cuts made: ' + str(totalCutsMade))
-    # print('Total problems solved: ' + str(totalProblemsSolved))
-    # print("=" * 100)
+    philp.WriteProgress()
+
+    print('Total cuts made: ' + str(totalCutsMade))
+    print('Total problems solved: ' + str(totalProblemsSolved))
+    print("=" * 100)
 
 timeRuns=time.clock() - start
 outTotalCuts = totalCutsMade
