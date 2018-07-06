@@ -100,6 +100,7 @@ class set(object):
         self.UpdateTolerances()
 
     def SolveMasterProblem(self):
+
         self.ResetSecondStageSolutions()
 
         cMaster = self.GetMasterc()
@@ -108,6 +109,9 @@ class set(object):
         lMaster = self.GetMasterl()
         uMaster = self.GetMasteru()
         senseMaster = self.GetMastersense()
+
+
+
 
         CutMatrix = np.vstack((self.objectiveCutsMatrix, self.feasibilityCutsMatrix))
         rows, cols = CutMatrix.nonzero()
@@ -153,13 +157,13 @@ class set(object):
         if not (exitFlag != 1 or np.matmul(cMaster, currentBest - currentCandidate) >= -1e-4 * np.matmul(cMaster,
                                                                                                          currentBest)):
             raise Exception('Actual objective drop = ' + str(np.matmul(cMaster, (currentBest - currentCandidate))))
-
         return exitFlag
 
     def SolveSubProblems(self):
         solution = self.candidateSolution
         for scenarioNum in range(self.lpModel.numScenarios):
             self.SubProblem(scenarioNum, solution)
+
 
     def SubProblem(self, inScenNumber, inSolution):
         q = self.lpModel.second_obj[inScenNumber] * self.objectiveScale
@@ -172,10 +176,11 @@ class set(object):
 
         xLocal = inSolution.X()
 
+
         mdl_sub = cplex.Cplex()
         mdl_sub.set_results_stream(None)
         mdl_sub.variables.add(obj=q, lb=l, ub=u)
-        mdl_sub.linear_constraints.add(senses=sense, rhs=d + xLocal * B.transpose())
+        mdl_sub.linear_constraints.add(senses=sense, rhs=d + B*xLocal)
         mdl_sub.linear_constraints.set_coefficients(D)
         mdl_sub.solve()
         solution = mdl_sub.solution
@@ -183,6 +188,7 @@ class set(object):
 
         if exitFlag != 1:
             warnings.warn("'***Scenario '" + str(inScenNumber) + "' exited with flag '" + str(exitFlag) + "'")
+
 
         y = np.array(solution.get_values())
         fval = np.float64(solution.get_objective_value())
@@ -199,6 +205,7 @@ class set(object):
                                       np.matmul(np.transpose(dj_u[u < cplex.infinity]), u[u < cplex.infinity]) -
                                       np.matmul(np.transpose(dj_l[l != 0]), l[l != 0]), 'int')
         inSolution.SetSecondStageValue(inScenNumber, fval)
+
 
     def GenerateCuts(self):
         if ~self.candidateSolution.MuFeasible():

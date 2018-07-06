@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ac11cf39-b8f1-4eca-84ea-7f0b53e15f3d" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/phi_lp_twostage.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/phi_lp_twostage.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PhiLP.py" beforeDir="false" afterPath="$PROJECT_DIR$/PhiLP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,11 +16,24 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/phi_lp_twostage$ExtepectedForm.coverage" NAME="ExtepectedForm Coverage Results" MODIFIED="1530670988596" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/phi_lp_twostage$PhiLP.coverage" NAME="PhiLP Coverage Results" MODIFIED="1530674795421" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/phi_lp_twostage$main.coverage" NAME="main Coverage Results" MODIFIED="1530674680776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/phi_lp_twostage$main.coverage" NAME="main Coverage Results" MODIFIED="1530905364885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/phi_lp_twostage$lp.coverage" NAME="lp Coverage Results" MODIFIED="1530655614069" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf>
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="342">
+              <caret line="68" column="20" selection-start-line="68" selection-start-column="20" selection-end-line="72" selection-end-column="20" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -34,9 +48,9 @@
       <list>
         <option value="$USER_HOME$/Downloads/phi_lp4/PhiLP.py" />
         <option value="$PROJECT_DIR$/lp.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/ExtepectedForm.py" />
         <option value="$PROJECT_DIR$/PhiLP.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
@@ -59,6 +73,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -70,7 +85,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -88,7 +102,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.PhiLP">
+  <component name="RunManager" selected="Python.main">
     <configuration name="ExtepectedForm" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="phi_lp_twostage" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -173,8 +187,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.PhiLP" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.PhiLP" />
         <item itemvalue="Python.ExtepectedForm" />
         <item itemvalue="Python.lp" />
       </list>
@@ -204,22 +218,22 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1280" height="778" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32892805" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="right" x="0" y="0" width="270" height="578" id="Documentation" side_tool="true" weight="0.32956383" />
+      <window_info anchor="right" x="0" y="0" width="270" height="578" id="Documentation" order="7" side_tool="true" visible="true" weight="0.21405493" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.30396476" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.23348017" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.32892805" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info content_ui="combo" id="Project" order="0" weight="0.24959612" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24959612" />
       <window_info anchor="right" id="R Packages" order="3" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="right" id="R Graphics" order="3" />
-      <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="right" id="SciView" order="3" />
+      <window_info anchor="right" id="R Graphics" order="4" />
+      <window_info anchor="right" id="Database" order="5" />
+      <window_info anchor="right" id="SciView" order="6" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -229,6 +243,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -248,20 +263,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Downloads/phi_lp4/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="469">
-          <caret line="89" selection-start-line="89" selection-end-line="93" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Downloads/phi_lp4/PhiLP.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="72" column="8" lean-forward="true" selection-start-line="72" selection-start-column="8" selection-end-line="76" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/Downloads/phi_lp4/main.py" />
+    <entry file="file://$USER_HOME$/Downloads/phi_lp4/PhiLP.py" />
     <entry file="file://$PROJECT_DIR$/PhiDivergence.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -316,11 +319,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test1.lp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-110371" />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/test1.lp" />
     <entry file="file://$PROJECT_DIR$/test0.lp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
@@ -328,22 +327,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/PhiLP.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="39" column="50" lean-forward="true" selection-start-line="39" selection-start-column="50" selection-end-line="39" selection-end-column="50" />
+        <state relative-caret-position="-4237">
+          <caret line="125" selection-start-line="125" selection-end-line="125" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#390#410#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PhiLP.py">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="174" column="30" selection-start-line="174" selection-start-column="30" selection-end-line="174" selection-end-column="30" />
+        <state relative-caret-position="342">
+          <caret line="68" column="20" selection-start-line="68" selection-start-column="20" selection-end-line="72" selection-end-column="20" />
           <folding>
-            <element signature="e#390#410#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

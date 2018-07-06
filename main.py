@@ -23,6 +23,7 @@ while not (
     totalProblemsSolved = totalProblemsSolved + 1
     exitFlag = philp.SolveMasterProblem()
 
+
     if ('cS' in locals() or 'cS' in globals()) and (np.array_equal(cS, philp.CandidateVector())):
         print(' ')
         print('Repeat Solution')
@@ -70,8 +71,7 @@ while not (
     print('Total cuts made: ' + str(totalCutsMade))
     print('Total problems solved: ' + str(totalProblemsSolved))
     print("=" * 100)
-
-timeRuns=time.clock() - start
+timeRuns =  time.clock() - start
 outTotalCuts = totalCutsMade
 outTotalProbs = totalProblemsSolved
 
