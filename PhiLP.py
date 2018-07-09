@@ -65,10 +65,11 @@ class set(object):
         self.InitializeBenders()
 
     def InitializeBenders(self):
-        self.objectiveCutsMatrix = np.array([], dtype=np.int64).reshape(0,
-                                                                        self.lpModel.first_obj.size + 2 + self.THETA.size)
-        self.objectiveCutsRHS = np.array([])
-        self.feasibilityCutsMatrix = np.array([], dtype=np.int64).reshape(0,
+        self.objectiveCutsMatrix = np.zeros((self.lpModel.first_obj.size + 2 + self.THETA.size), dtype=np.float64)
+        self.objectiveCutsMatrix[self.THETA] = -1
+        self.objectiveCutsRHS = np.array([0])
+
+        self.feasibilityCutsMatrix = np.array([], dtype=np.float64).reshape(0,
                                                                           self.lpModel.first_obj.size + 2 + self.THETA.size)
         self.feasibilityCutsRHS = np.array([])
 
@@ -403,7 +404,7 @@ class set(object):
         lOut = np.append(self.lpModel.first_lb, np.zeros(2 + self.THETA.size))
         lOut[self.LAMBDA] = self.lambdaLowerBound
         lOut[self.MU] = -cplex.infinity
-        lOut[self.THETA] = np.float64(-10 ** 19)
+        lOut[self.THETA] = -cplex.infinity
         return lOut
 
     def GetMasteru(self):
